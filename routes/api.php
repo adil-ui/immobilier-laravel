@@ -34,11 +34,12 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/list-users', [UserController::class, 'getUsers']);
 Route::post('/add-user', [UserController::class, 'addUser']);
 
-Route::get('/list-properties', [PropertyController::class, 'getProperties']);
+Route::get('/list-properties/{page}', [PropertyController::class, 'getPropertyPerPage']);
 Route::post('/add-property', [PropertyController::class, 'addProperty']);
 
 Route::get('/list-categories', [CategoryController::class, 'getCategories']);
 Route::post('/add-category', [CategoryController::class, 'addCategory']);
+Route::post('/delete-category/{id}', [CategoryController::class, 'deleteCategory']);
 
 Route::get('/list-cities', [CityController::class, 'getCities']);
 Route::post('/add-city', [CityController::class, 'addCity']);

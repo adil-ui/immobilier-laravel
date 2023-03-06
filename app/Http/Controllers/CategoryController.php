@@ -31,4 +31,8 @@ class CategoryController extends Controller
         $categories = Category::all();
         return response()->json(['categories', $categories]);
     }
+    public function deleteCatgory($id) {
+        Category::find($id)->delete();
+        return response()->json(['success' => 'Spprimer avec succès']);
+    }
 }

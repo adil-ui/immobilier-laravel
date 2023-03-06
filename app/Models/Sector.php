@@ -10,7 +10,7 @@ class Sector extends Model
     use HasFactory;
     protected $fillable = [
         'name',
-        'cityId',
+        'city_id',
         'created_at',
         'updated_at'
     ];

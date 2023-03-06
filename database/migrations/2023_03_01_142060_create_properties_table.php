@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('title', 100);
             $table->string('picture', 255);
             $table->string('description');
-            $table->string('address', 255);
+            $table->integer('property_Num');
             $table->foreignIdFor(Category::class);
             $table->integer('type');
             $table->double('price');
@@ -31,12 +31,12 @@ return new class extends Migration
             $table->integer('floor');
             $table->integer('area');
             $table->date('building_date');
-            $table->foreignIdFor(City::class);
-            $table->foreignIdFor(Sector::class);
-            $table->foreignIdFor(District::class);
             $table->integer('zip_code');
             $table->float('longitude');
             $table->float('latitude');
+            $table->foreignIdFor(City::class);
+            $table->foreignIdFor(Sector::class);
+            $table->foreignIdFor(District::class);
             $table->foreignIdFor(User::class);
             $table->timestamps();
         });

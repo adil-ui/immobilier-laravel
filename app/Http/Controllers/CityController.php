@@ -10,7 +10,10 @@ class CityController extends Controller
 {
     public function addCity(Request $request)
     {
+        error_log('Some message here.');
+
         if ($request->isMethod("post")) {
+
             if ($request->filled("name")) {
                 $city = new City();
                 $city->name = $request->name;
@@ -29,6 +32,6 @@ class CityController extends Controller
     {
         $cities = City::all();
         return response()->json(['cities', $cities]);
-
+        // return response()->json(['name', '$cities']);
     }
 }
