@@ -18,12 +18,12 @@ return new class extends Migration
     {
         Schema::create('properties', function (Blueprint $table) {
             $table->id();
-            $table->string('title', 100);
+            $table->string('title', 100)->unique();
             $table->string('picture', 255);
             $table->string('description');
-            $table->integer('property_Num');
+            $table->integer('property_num');
             $table->foreignIdFor(Category::class);
-            $table->integer('type');
+            $table->string('type');
             $table->double('price');
             $table->integer('bedroom');
             $table->integer('bathroom');

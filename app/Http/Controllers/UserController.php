@@ -18,11 +18,11 @@ class UserController extends Controller
                 $user->email = $request->email;
                 $user->password = Hash::make($request->password);
                 $user->name = $request->name;
-                $user->adress = $request->address;
+                $user->address = $request->address;
                 $user->phone = $request->phone;
                 $user->created_at = Carbon::now();
                 $user->updated_at = Carbon::now();
-                $user->role = 'customer';
+                $user->role = 'user';
                 if ($request->hasFile('picture') && $request->file('picture')->isValid()) {
                     $user->picture = 'storage/' . $request->picture->store('user/images');
                 }
@@ -58,5 +58,20 @@ class UserController extends Controller
             $user = User::find($id);
             return response()->json(['success' => 'Modifier avec success', "user" => $user]);
         }
+    }
+    public function getUsers()
+    {
+        $users = User::orderBy("created_at", "desc")->get();
+        return response()->json(['users' => $users]);
+    }
+    public function getUserPerPage($page)
+    {
+        $users = User::orderBy("created_at", "desc")->offset(5 * ($page - 1))->limit(5)->get();
+        return response()->json(['users' => $users]);
+    }
+    public function getLastUsers()
+    {
+        $users = User::orderBy("created_at", "desc")->limit(5)->get();
+        return response()->json(['users' => $users]);
     }
 }

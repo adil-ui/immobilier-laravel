@@ -12,7 +12,7 @@ class Property extends Model
         'title',
         'picture',
         'description',
-        'property_Num',
+        'property_num',
         'category_id',
         'type',
         'price',
@@ -32,6 +32,30 @@ class Property extends Model
         'created_at',
         'updated_at'
     ];
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function Propertypicture()
+    {
+        return $this->hasMany(PropertyPictures::class);
+    }
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+    public function city()
+    {
+        return $this->belongsTo(City::class);
+    }
+    public function sector()
+    {
+        return $this->belongsTo(Sector::class);
+    }
+    public function district()
+    {
+        return $this->belongsTo(District::class);
+    }
 }
 
 

@@ -10,58 +10,79 @@ use App\Models\Sector;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PropertyController extends Controller
 {
     public function addProperty(Request $request)
     {
         if ($request->isMethod("post")) {
-            if ($request->filled(["title", "description", "propertyNum","categoryId", "type", "price", "bedroom", "bathroom", "floor", "area", "zipCode", "longitude", "latitude", "longitude", "longitude", "longitude"])) {
-                $property = new Property;
-                $property->title = $request->title;
-                $property->description = $request->description;
-                $property->property_Num = $request->propertyNum;
-                $property->type = $request->type;
-                $property->price = $request->price;
-                $property->bedroom = $request->bedroom;
-                $property->bathroom = $request->bathroom;
-                $property->living_room = $request->livingRoom;
-                $property->floor = $request->floor;
-                $property->area = $request->area;
-                $property->building_date = $request->buildingDate;
-                $property->zip_code = $request->zipCode;
-                $property->longitude = $request->longitude;
-                $property->latitude = $request->latitude;
-                $property->category_id = $request->categoryId;
-                $property->city_id = $request->cityId;
-                $property->sector_id = $request->sectorId;
-                $property->district_id = $request->districtId;
-                $property->user_id = $request->userId;
-                $property->created_at = Carbon::now();
-                $property->updated_at = Carbon::now();
-                $city = new City;
-                $city->name = $request->cityName;
-
-                $sector = new  Sector;
-                $sector->name = $request->SectorName;
-                $sector->city_id = $request->cityId;
-
-                $district = new  District;
-                $district->name = $request->districtName;
-                $district->sector_id = $request->sectorId;
-
+            if ($request->filled(["title", "description", "propertyNum", "categoryId", "type", "price", "bedroom", "bathroom", "floor", "area", "zipCode", "longitude", "latitude", "longitude", "longitude", "longitude"])) {
                 if ($request->hasFile('picture') && $request->file('picture')->isValid()) {
-                    $property->picture = 'storage/' . $request->picture->store('property/images');
-                }
-                try {
-                    $property->save();
-                    $sector->save();
-                    $district->save();
-                    return response()->json(["success" => "Logement ajouter avec succès" ]);
-                } catch (Exception $e) {
-                    return response()->json(["error" => "An error occurred" . $e->getMessage()], 404);
-                }
+                    try {
+                        $propertyPicture = 'storage/' . $request->picture->store('property/images');
+                        $city = City::create([
+                            "name" => $request->cityName
+                        ]);
 
+                        $sector = Sector::create([
+                            "name" => $request->sectorName,
+                            "city_id" => $city->id,
+                        ]);
+
+                        $district = District::create([
+                            "name" => $request->districtName,
+                            "sector_id" => $sector->id,
+                        ]);
+
+                        $property = Property::create([
+                            "title" => $request->title,
+                            "description" => $request->description,
+                            "picture" => $propertyPicture,
+                            "property_num" => $request->propertyNum,
+                            "type" => $request->type,
+                            "price" => $request->price,
+                            "bedroom" => $request->bedroom,
+                            "bathroom" => $request->bathroom,
+                            "living_room" => $request->livingRoom,
+                            "floor" => $request->floor,
+                            "area" => $request->area,
+                            "building_date" => $request->buildingDate,
+                            "zip_code" => $request->zipCode,
+                            "longitude" => $request->longitude,
+                            "latitude" => $request->latitude,
+                            "category_id" => $request->categoryId,
+                            "city_id" => $city->id,
+                            "sector_id" => $sector->id,
+                            "district_id" => $district->id,
+                            "user_id" => $request->userId,
+                            "created_at" => Carbon::now(),
+                            "updated_at" => Carbon::now(),
+                        ]);
+
+                        if ($request->has("number_pictures")) {
+                            for ($number = 1; $number <= $request->number_pictures; $number++) {
+                                if ($request->hasFile("picture_$number") && $request->file("picture_$number")->isValid()) {
+                                    $picture = 'storage/' . $request->file("picture_$number")->store('property/images');
+                                    PropertyPictures::create([
+                                        'picture' => $picture,
+                                        'property_id' => $property->id,
+                                        "created_at" => Carbon::now(),
+                                        "updated_at" => Carbon::now()
+                                    ]);
+                                }
+                            }
+                            return response()->json(["success" => "Propriété ajouter avec succès"]);
+                        } else {
+                            return response()->json(["error" => "Les champs sont obligatoires"], 400);
+                        }
+                    } catch (Exception $e) {
+                        return response()->json(["error" => "An error occurred" . $e->getMessage()], 500);
+                    }
+
+                } else {
+                    return response()->json(["error" => "Les champs sont obligatoires"], 400);
+                }
 
             } else {
                 return response()->json(["error" => "Les champs sont obligatoires"], 400);
@@ -69,9 +90,42 @@ class PropertyController extends Controller
 
         }
     }
+    public function getProperties()
+    {
+        $properties = Property::orderBy("created_at", "desc")->with(['category', 'city','sector','district','user'])->get();
+        return response()->json(['properties' => $properties]);
+    }
+    public function getAllPropertyPerPage($page)
+    {
+        $properties = Property::orderBy("created_at", "desc")->with(['category', 'city','sector','district','user'])->offset(5 * ($page - 1))->limit(5)->get();
+        return response()->json(['properties' => $properties]);
+    }
+    public function getHomeProperties()
+    {
+        $properties = Property::orderBy("created_at", "desc")->with(['category', 'city','sector','district','user'])->limit(6)->get();
+        return response()->json(['properties' => $properties]);
+    }
+
+    public function getAllProperties()
+    {
+        $properties = Property::orderBy("created_at", "desc")->with(['category', 'user'])->get();
+        return response()->json(['properties' => $properties]);
+    }
     public function getPropertyPerPage($page)
     {
-        $property = Property::orderBy("created_at", "desc")->offset(5 * ($page - 1))->limit(5)->get();
-        return response()->json(['property' => $property]);
+        $properties = Property::orderBy("created_at", "desc")->with(['category', 'user'])->offset(5 * ($page - 1))->limit(5)->get();
+        return response()->json(['properties' => $properties]);
+    }
+
+
+    public function getMyProperties($id)
+    {
+        $properties = Property::where('user_id', $id)->orderBy('created_at', 'desc')->with('category')->get();
+        return response()->json(['properties' => $properties]);
+    }
+    public function getMyPropertyPerPage($id, $page)
+    {
+        $properties = Property::where('user_id', $id)->orderBy('created_at', 'desc')->with('category')->offset(5 * ($page - 1))->limit(5)->get();
+        return response()->json(['properties' => $properties]);
     }
 }

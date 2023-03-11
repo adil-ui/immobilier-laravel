@@ -14,4 +14,8 @@ class PropertyPictures extends Model
         'created_at',
         'updated_at'
     ];
+    public function Property()
+    {
+        return $this->belongsTo(Property::class);
+    }
 }

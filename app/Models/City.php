@@ -13,4 +13,8 @@ class City extends Model
         'created_at',
         'updated_at'
     ];
+    public function Sector()
+    {
+        return $this->hasMany(Sector::class);
+    }
 }

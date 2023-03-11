@@ -23,18 +23,33 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::group(["middleware" => "auth:sanctum"], function () {
+    Route::post('/revoke-tokens', [AuthController::class, 'revokeTokens']);
+    Route::get('/list-users/{page}', [UserController::class, 'getUserPerPage']);
+    Route::get('/list-users', [UserController::class, 'getUsers']);
+    Route::get('/last-users', [UserController::class, 'getLastUsers']);
+
+
+    Route::get('/list-properties', [PropertyController::class, 'getAllProperties']);
+    Route::get('/list-properties/{page}', [PropertyController::class, 'getPropertyPerPage']);
+
+    Route::get('/my-properties/{id}', [PropertyController::class, 'getMyProperties']);
+    Route::get('/my-properties/{id}/{page}', [PropertyController::class, 'getMyPropertyPerPage']);
+
+
+
 });
 
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password/{token}', [AuthController::class, 'resetPassword']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [UserController::class, 'register']);
 
-Route::get('/list-users', [UserController::class, 'getUsers']);
-Route::post('/add-user', [UserController::class, 'addUser']);
+Route::get('/properties', [PropertyController::class, 'getProperties']);
+Route::get('/properties/{page}', [PropertyController::class, 'getAllPropertyPerPage']);
 
-Route::get('/list-properties/{page}', [PropertyController::class, 'getPropertyPerPage']);
+Route::get('/home-properties', [PropertyController::class, 'getHomeProperties']);
+
 Route::post('/add-property', [PropertyController::class, 'addProperty']);
 
 Route::get('/list-categories', [CategoryController::class, 'getCategories']);
@@ -52,6 +67,4 @@ Route::post('/add-district', [DistrictController::class, 'addDistrict']);
 
 Route::post("/contact", [ContactController::class, "contact"]);
 
-Route::get('/details/{id}', [DetailController::class, "getPropert"]);
-
-
+Route::get('/details/{id}', [DetailController::class, "getProperty"]);

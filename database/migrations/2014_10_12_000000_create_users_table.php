@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('address', 255);
             $table->integer('phone');
             $table->string('picture', 255);
+            $table->enum("role", ["admin", "user"]);
             $table->rememberToken();
             $table->timestamps();
         });

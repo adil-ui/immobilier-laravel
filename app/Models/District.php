@@ -14,4 +14,9 @@ class District extends Model
         'created_at',
         'updated_at'
     ];
+    public function Property()
+    {
+        return $this->belongsTo(Sector::class);
+    }
+    
 }

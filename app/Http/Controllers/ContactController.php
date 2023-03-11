@@ -15,7 +15,7 @@ class ContactController extends Controller
         if ($request->filled(["name", "email","subject", "message"])) {
             try {
                 Mail::to($request->email)->send(new MessageReceptionConfirmation($request->name, $request->subject));
-                Mail::to("adil-boussalem@hotmail.com")->send(new SendMessage($request->name, $request->email,$request->subject, $request->message));
+                Mail::to("adilboussaleem@gmail.com")->send(new SendMessage($request->name, $request->email,$request->subject, $request->message));
                 return response()->json(["success" => "Message envoyé avec succès!"]);
             } catch (Exception $e) {
                 return response()->json(["error" => "Une erreur est survenue ! " . $e->getMessage()], 500);

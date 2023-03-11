@@ -15,8 +15,10 @@ use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
+
     public function login(Request $request)
     {
+
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
@@ -24,10 +26,11 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $token = Auth::user()->createToken(Auth::user()->name);
-            return response()->json(['token' => $token->plainTextToken, "user" => Auth::user()]);
+            return response()->json(['token' => $token->plainTextToken, "user" => Auth::user()], 200);
 
         }
-        return response()->json(["error" => "User not found"], 404);
+
+        return response()->json(["error" => "Utilisateur introuvable"], 404);
     }
 
     public function revokeTokens(Request $request)
@@ -43,32 +46,32 @@ class AuthController extends Controller
         if ($queryResults->exists()) {
             $user = $queryResults->first();
             $token = md5($request->email);
-            DB::table('password_resets')->insert([
+            DB::table('password_reset_tokens')->insert([
                 "email" => $request->email,
                 "token" => $token,
                 "created_at" => Carbon::now()
             ]);
             try {
                 Mail::to($user->email)->send(new ResetPassword($user, $token));
-                return response()->json(["success" => "Email Successfully Sent"]);
+                return response()->json(["success" => "Message envoyer avec succès"]);
             } catch (Exception $e) {
                 return response()->json(["error" => "An Error Has Occurred " . $e->getMessage()], 500);
             }
         } else {
-            return response()->json(["error" => "Email Not Found"], 400);
+            return response()->json(["error" => "Email introuvable"], 400);
         }
     }
 
     public function resetPassword(Request $request, $token)
     {
         if ($request->isMethod('post')) {
-            $query = DB::table('password_resets')->where("token", $token);
+            $query = DB::table('password_reset_tokens')->where("token", $token);
             if ($query->count() == 1) {
                 $passwordResets = $query->first();
                 $user = User::where("email", $passwordResets->email)->first();
                 try {
                     User::where("id", $user->id)->update(["password" => Hash::make($request->password)]);
-                    return response()->json(["success" => "Password Successfully Changed"]);
+                    return response()->json(["success" => "Mot de passe modifier avec succès"]);
                 } catch (Exception $e) {
                     return response()->json(["error" => "An Error Has Occurred" . $e->getMessage()], 500);
                 }
