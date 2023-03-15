@@ -17,23 +17,38 @@ class PropertyController extends Controller
     public function addProperty(Request $request)
     {
         if ($request->isMethod("post")) {
-            if ($request->filled(["title", "description", "propertyNum", "categoryId", "type", "price", "bedroom", "bathroom", "floor", "area", "zipCode", "longitude", "latitude", "longitude", "longitude", "longitude"])) {
+            if ($request->filled(["title", "description", "propertyNum", "categoryId", "type", "price", "bedroom", "bathroom", "floor", "area", "zipCode", "longitude", "latitude"])) {
                 if ($request->hasFile('picture') && $request->file('picture')->isValid()) {
                     try {
                         $propertyPicture = 'storage/' . $request->picture->store('property/images');
-                        $city = City::create([
-                            "name" => $request->cityName
-                        ]);
 
-                        $sector = Sector::create([
-                            "name" => $request->sectorName,
-                            "city_id" => $city->id,
-                        ]);
+                        $myCity = City::find($request->cityName);
+                        if ($myCity && $myCity->name === $request->cityName) {
+                            $city = City::find($request->cityName);
+                        } else {
+                            $city = City::create([
+                                "name" => $request->cityName
+                            ]);
+                        }
+                        $mySector = Sector::find($request->sectorName);
+                        if ($mySector && $mySector->name === $request->sectorName) {
+                            $sector = Sector::find($request->sectorName);
+                        } else {
+                            $sector = Sector::create([
+                                "name" => $request->sectorName,
+                                "city_id" => $city->id,
+                            ]);
+                        }
+                        $myDistrict = District::find($request->districtName);
+                        if ($myDistrict && $myDistrict->name === $request->districtName) {
+                            $district = District::find($request->districtName);
+                        } else {
+                            $district = District::create([
+                                "name" => $request->districtName,
+                                "sector_id" => $sector->id,
+                            ]);
+                        }
 
-                        $district = District::create([
-                            "name" => $request->districtName,
-                            "sector_id" => $sector->id,
-                        ]);
 
                         $property = Property::create([
                             "title" => $request->title,
@@ -92,17 +107,17 @@ class PropertyController extends Controller
     }
     public function getProperties()
     {
-        $properties = Property::orderBy("created_at", "desc")->with(['category', 'city','sector','district','user'])->get();
+        $properties = Property::orderBy("created_at", "desc")->with(['category', 'city', 'sector', 'district', 'user'])->get();
         return response()->json(['properties' => $properties]);
     }
     public function getAllPropertyPerPage($page)
     {
-        $properties = Property::orderBy("created_at", "desc")->with(['category', 'city','sector','district','user'])->offset(5 * ($page - 1))->limit(5)->get();
+        $properties = Property::orderBy("created_at", "desc")->with(['category', 'city', 'sector', 'district', 'user'])->offset(5 * ($page - 1))->limit(5)->get();
         return response()->json(['properties' => $properties]);
     }
     public function getHomeProperties()
     {
-        $properties = Property::orderBy("created_at", "desc")->with(['category', 'city','sector','district','user'])->limit(6)->get();
+        $properties = Property::orderBy("created_at", "desc")->with(['category', 'city', 'sector', 'district', 'user'])->limit(6)->get();
         return response()->json(['properties' => $properties]);
     }
 
@@ -126,6 +141,49 @@ class PropertyController extends Controller
     public function getMyPropertyPerPage($id, $page)
     {
         $properties = Property::where('user_id', $id)->orderBy('created_at', 'desc')->with('category')->offset(5 * ($page - 1))->limit(5)->get();
+        return response()->json(['properties' => $properties]);
+    }
+
+    public function filter(Request $request)
+    {
+        $query = Property::query();
+        if ($request->filled('city')) {
+            $query->where("city_id", $request->city);
+        }
+
+        if ($request->filled('category')) {
+            $query->where("category_id", $request->category);
+        }
+
+        if ($request->filled('type')) {
+            $query->where("type", $request->type);
+        }
+
+        if ($request->filled('living_room')) {
+            $query->where("living_room", $request->livingRoom);
+        }
+
+        if ($request->filled('bedroom')) {
+            $query->where("bedroom", $request->bedroom);
+        }
+
+        if ($request->filled('bathroom')) {
+            $query->where("bathroom", $request->bathroom);
+        }
+
+        if ($request->filled('floor')) {
+            $query->where("floor", $request->floor);
+        }
+
+        if ($request->filled(['areaMin', 'areaMax'])) {
+            $query->where([["area", '>=', $request->areaMin], ["area", '<=', $request->areaMax]]);
+        }
+
+        if ($request->filled(['priceMin', 'priceMax'])) {
+            $query->where(["price", '>=', $request->priceMin], ["price", '<=', $request->priceMax]);
+        }
+        $properties = $query->orderBy('created_at', 'desc')->with('category')->get();
+
         return response()->json(['properties' => $properties]);
     }
 }

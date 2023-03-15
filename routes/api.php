@@ -52,6 +52,9 @@ Route::get('/home-properties', [PropertyController::class, 'getHomeProperties'])
 
 Route::post('/add-property', [PropertyController::class, 'addProperty']);
 
+Route::post('/filter-properties', [PropertyController::class, 'filter']);
+
+
 Route::get('/list-categories', [CategoryController::class, 'getCategories']);
 Route::post('/add-category', [CategoryController::class, 'addCategory']);
 Route::post('/delete-category/{id}', [CategoryController::class, 'deleteCategory']);
