@@ -50,9 +50,9 @@
 		<div class="content">
 			<table>
 			<tr>
-				<td align="center">
+				<td>
                     <h4>Bonjour Nouveau Message</h4>
-                    <div class="mb-4 "><span class="fw-bold" style="color:red">Name:</span> {{ $name }}</div>
+                    <div class="mb-4 "><span class="fw-bold" >Name:</span> {{ $name }}</div>
                     <div class="mb-4"><span class="fw-bold">Email:</span> {{ $email }}</div>
                     <div class=""><span class="fw-bold">Message:</span> {{ $content }}</div>
 				</td>

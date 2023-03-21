@@ -25,16 +25,20 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(["middleware" => "auth:sanctum"], function () {
     Route::post('/revoke-tokens', [AuthController::class, 'revokeTokens']);
+
     Route::get('/list-users/{page}', [UserController::class, 'getUserPerPage']);
     Route::get('/list-users', [UserController::class, 'getUsers']);
-    Route::get('/last-users', [UserController::class, 'getLastUsers']);
-
+    Route::get('/last-properties', [PropertyController::class, 'getLastPropoerty']);
+    Route::post('/edit-user/{id}', [UserController::class, 'editUser']);
 
     Route::get('/list-properties', [PropertyController::class, 'getAllProperties']);
     Route::get('/list-properties/{page}', [PropertyController::class, 'getPropertyPerPage']);
 
     Route::get('/my-properties/{id}', [PropertyController::class, 'getMyProperties']);
     Route::get('/my-properties/{id}/{page}', [PropertyController::class, 'getMyPropertyPerPage']);
+
+    Route::post('/edit-property/{id}', [PropertyController::class, 'editProperty']);
+    Route::delete('/delete-property/{id}', [PropertyController::class ,'delete']);
 
 
 
@@ -53,6 +57,7 @@ Route::get('/home-properties', [PropertyController::class, 'getHomeProperties'])
 Route::post('/add-property', [PropertyController::class, 'addProperty']);
 
 Route::post('/filter-properties', [PropertyController::class, 'filter']);
+Route::post('/filter-properties-per-page/{page}', [PropertyController::class, 'filterPerPage']);
 
 
 Route::get('/list-categories', [CategoryController::class, 'getCategories']);
@@ -69,5 +74,6 @@ Route::get('/list-districts', [DistrictController::class, 'getDistricts']);
 Route::post('/add-district', [DistrictController::class, 'addDistrict']);
 
 Route::post("/contact", [ContactController::class, "contact"]);
+Route::post("/contact-user", [ContactController::class, "contactUser"]);
 
 Route::get('/details/{id}', [DetailController::class, "getProperty"]);

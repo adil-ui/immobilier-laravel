@@ -6,6 +6,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -38,8 +39,7 @@ class UserController extends Controller
             }
         }
     }
-
-    public function updateUser(Request $request, $id)
+    public function editUser(Request $request, $id)
     {
         if ($request->isMethod('post')) {
             $user = User::find($id);
@@ -55,8 +55,7 @@ class UserController extends Controller
                 "password" => $user->password != $request->password ? Hash::make($request->password) : $user->password,
                 "picture" => $picture,
             ]);
-            $user = User::find($id);
-            return response()->json(['success' => 'Modifier avec success', "user" => $user]);
+            return response()->json(['success' => 'Modifier avec success', "user" => Auth::user()]);
         }
     }
     public function getUsers()
@@ -71,7 +70,7 @@ class UserController extends Controller
     }
     public function getLastUsers()
     {
-        $users = User::orderBy("created_at", "desc")->limit(5)->get();
+        $users = User::orderBy("created_at", "desc")->get();
         return response()->json(['users' => $users]);
     }
 }
