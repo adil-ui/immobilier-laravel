@@ -182,9 +182,9 @@ class PropertyController extends Controller
                         for ($number = 1; $number <= $request->number_pictures; $number++) {
                             if ($request->hasFile("picture_$number") && $request->file("picture_$number")->isValid()) {
                                 $picture = 'storage/' . $request->file("picture_$number")->store('property/images');
-                                PropertyPictures::where("property_id", $myProperty->id)->update([
+                                PropertyPictures::create([
                                     'picture' => $picture,
-                                    'property_id' => $$myProperty->id,
+                                    'property_id' => $myProperty->id,
                                     "updated_at" => Carbon::now()
                                 ]);
                             }
@@ -227,8 +227,9 @@ class PropertyController extends Controller
     }
     public function getPropertyPerPage($page)
     {
-        $properties = Property::orderBy("created_at", "desc")->with(['category', 'user'])->offset(5 * ($page - 1))->limit(5)->get();
-        return response()->json(['properties' => $properties]);
+        $propertyPictures = PropertyPictures::all();
+        $properties = Property::orderBy("created_at", "desc")->with(['category', 'user','city','sector','district'])->offset(5 * ($page - 1))->limit(5)->get();
+        return response()->json(['properties' => $properties, 'propertyPictures' => $propertyPictures]);
     }
 
 
@@ -338,6 +339,9 @@ class PropertyController extends Controller
     public function delete($id)
     {
         Property::find($id)->delete();
-        return response()->json(['success' => 'Suprimer avec succès']);
+    }
+    public function deletePicture($id)
+    {
+        PropertyPictures::find($id)->delete();
     }
 }

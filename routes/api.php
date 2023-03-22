@@ -40,6 +40,10 @@ Route::group(["middleware" => "auth:sanctum"], function () {
     Route::post('/edit-property/{id}', [PropertyController::class, 'editProperty']);
     Route::delete('/delete-property/{id}', [PropertyController::class ,'delete']);
 
+    Route::delete('/delete-picture/{id}', [PropertyController::class ,'deletePicture']);
+    Route::post('/delete-category/{id}', [CategoryController::class, 'deleteCategory']);
+
+
 
 
 });
@@ -62,7 +66,6 @@ Route::post('/filter-properties-per-page/{page}', [PropertyController::class, 'f
 
 Route::get('/list-categories', [CategoryController::class, 'getCategories']);
 Route::post('/add-category', [CategoryController::class, 'addCategory']);
-Route::post('/delete-category/{id}', [CategoryController::class, 'deleteCategory']);
 
 Route::get('/list-cities', [CityController::class, 'getCities']);
 Route::post('/add-city', [CityController::class, 'addCity']);

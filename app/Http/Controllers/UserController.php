@@ -55,7 +55,8 @@ class UserController extends Controller
                 "password" => $user->password != $request->password ? Hash::make($request->password) : $user->password,
                 "picture" => $picture,
             ]);
-            return response()->json(['success' => 'Modifier avec success', "user" => Auth::user()]);
+            $user = User::find($id);
+            return response()->json(['success' => 'Modifier avec success', "user" => $user]);
         }
     }
     public function getUsers()
