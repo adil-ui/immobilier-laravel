@@ -11,7 +11,7 @@ class SectorController extends Controller
     public function addSector(Request $request)
     {
         if ($request->isMethod("post")) {
-            if ($request->filled(["name",["cityId"]])) {
+            if ($request->filled(["name", ["cityId"]])) {
                 $sector = new Sector();
                 $sector->name = $request->name;
                 $sector->cityId = $request->cityId;
@@ -26,9 +26,9 @@ class SectorController extends Controller
             }
         }
     }
-    public function getsectors()
+    public function getSectors()
     {
         $sectors = Sector::all();
-        return response()->json(['sectors', $sectors]);
+        return response()->json(['sectors' => $sectors]);
     }
 }

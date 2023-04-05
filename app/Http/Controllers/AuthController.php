@@ -71,7 +71,8 @@ class AuthController extends Controller
                 $user = User::where("email", $passwordResets->email)->first();
                 try {
                     User::where("id", $user->id)->update(["password" => Hash::make($request->password)]);
-                    return response()->json(["success" => "Mot de passe modifier avec succès"]);
+                    $query = DB::table('password_reset_tokens')->where("token", $token)->delete();
+                    return response()->json(["success" => "Modifier avec succès"]);
                 } catch (Exception $e) {
                     return response()->json(["error" => "An Error Has Occurred" . $e->getMessage()], 500);
                 }

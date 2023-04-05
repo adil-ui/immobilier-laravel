@@ -206,7 +206,8 @@ class PropertyController extends Controller
     public function getProperties()
     {
         $properties = Property::orderBy("created_at", "desc")->with(['category', 'city', 'sector', 'district', 'user'])->get();
-        return response()->json(['properties' => $properties]);
+        $propertiesLenght = count($properties);
+        return response()->json(['properties' => $properties, 'propertiesLenght'=> $propertiesLenght]);
     }
     public function getAllPropertyPerPage($page)
     {
@@ -217,31 +218,36 @@ class PropertyController extends Controller
     public function getHomeProperties()
     {
         $properties = Property::orderBy("created_at", "desc")->with(['category', 'city', 'sector', 'district', 'user'])->limit(6)->get();
+
         return response()->json(['properties' => $properties]);
     }
 
     public function getAllProperties()
     {
-        $properties = Property::orderBy("created_at", "desc")->with(['category', 'user'])->get();
-        return response()->json(['properties' => $properties]);
+        $properties = Property::orderBy("created_at", "desc")->with(['category', 'user', 'city'])->get();
+        $propertiesLenght = count($properties);
+        return response()->json(['properties' => $properties, 'propertiesLenght'=> $propertiesLenght]);
     }
     public function getPropertyPerPage($page)
     {
         $propertyPictures = PropertyPictures::all();
-        $properties = Property::orderBy("created_at", "desc")->with(['category', 'user','city','sector','district'])->offset(5 * ($page - 1))->limit(5)->get();
-        return response()->json(['properties' => $properties, 'propertyPictures' => $propertyPictures]);
+        $properties = Property::orderBy("created_at", "desc")->with(['category', 'user', 'city', 'sector', 'district'])->offset(5 * ($page - 1))->limit(5)->get();
+        $propertiesLenght = count( Property::all());
+        return response()->json(['properties' => $properties, 'propertyPictures' => $propertyPictures, 'propertiesLenght'=> $propertiesLenght]);
     }
 
 
     public function getMyProperties($id)
     {
-        $properties = Property::where('user_id', $id)->orderBy('created_at', 'desc')->with('category')->get();
-        return response()->json(['properties' => $properties]);
+        $properties = Property::where('user_id', $id)->orderBy('created_at', 'desc')->with(['category', 'city'])->get();
+        $propertiesLenght = count( $properties);
+        return response()->json(['properties' => $properties, 'propertiesLenght'=> $propertiesLenght]);
     }
     public function getMyPropertyPerPage($id, $page)
     {
-        $properties = Property::where('user_id', $id)->orderBy('created_at', 'desc')->with('category')->offset(5 * ($page - 1))->limit(5)->get();
-        return response()->json(['properties' => $properties]);
+        $properties = Property::where('user_id', $id)->orderBy('created_at', 'desc')->with(['category', 'city'])->offset(5 * ($page - 1))->limit(5)->get();
+        $propertiesLenght = count(Property::where('user_id', $id)->get());
+        return response()->json(['properties' => $properties, 'propertiesLenght'=> $propertiesLenght]);
     }
 
     public function filter(Request $request)
@@ -259,7 +265,7 @@ class PropertyController extends Controller
             $query->where("type", $request->type);
         }
 
-        if ($request->filled('living_room')) {
+        if ($request->filled('livingRoom')) {
             $query->where("living_room", $request->livingRoom);
         }
 
@@ -283,8 +289,9 @@ class PropertyController extends Controller
             $query->where([["price", '>=', $request->priceMin], ["price", '<=', $request->priceMax]]);
         }
         $properties = $query->orderBy('created_at', 'desc')->with(['category', 'city', 'sector', 'district'])->get();
+        $propertiesLenght = count( $properties);
 
-        return response()->json(['properties' => $properties]);
+        return response()->json(['properties' => $properties, 'propertiesLenght'=> $propertiesLenght]);
     }
     public function filterPerPage(Request $request, $page)
     {
@@ -301,7 +308,7 @@ class PropertyController extends Controller
             $query->where("type", $request->type);
         }
 
-        if ($request->filled('living_room')) {
+        if ($request->filled('livingRoom')) {
             $query->where("living_room", $request->livingRoom);
         }
 
@@ -325,8 +332,9 @@ class PropertyController extends Controller
             $query->where([["price", '>=', $request->priceMin], ["price", '<=', $request->priceMax]]);
         }
         $properties = $query->orderBy('created_at', 'desc')->with(['category', 'city', 'sector', 'district'])->offset(5 * ($page - 1))->limit(5)->get();
+        $propertiesLenght = count( $properties);
 
-        return response()->json(['properties' => $properties]);
+        return response()->json(['properties' => $properties, 'propertiesLenght'=> $propertiesLenght]);
     }
     public function getLastPropoerty()
     {
@@ -334,7 +342,9 @@ class PropertyController extends Controller
         $nbrProperty = count(Property::all());
         $nbrCategory = count(Category::all());
         $properties = Property::orderBy("created_at", "desc")->with(['category', 'user'])->limit(5)->get();
-        return response()->json(['properties' => $properties, 'nbrUser' => $nbrUser, 'nbrProperty' => $nbrProperty, 'nbrCategory' => $nbrCategory]);
+        $propertiesLenght = count( $properties);
+
+        return response()->json(['properties' => $properties, 'nbrUser' => $nbrUser, 'nbrProperty' => $nbrProperty, 'nbrCategory' => $nbrCategory, 'propertiesLenght'=> $propertiesLenght]);
     }
     public function delete($id)
     {
@@ -343,5 +353,45 @@ class PropertyController extends Controller
     public function deletePicture($id)
     {
         PropertyPictures::find($id)->delete();
+    }
+    public function search(Request $request, $id)
+    {
+        if ($request->search == "id") {
+            $properties = Property::where('user_id', $id)->where('id', $request->searchValue)->orderBy('created_at', 'desc')->with(['category', 'city', 'user'])->get();
+            $propertiesLenght = count( $properties);
+            return response()->json(['properties' => $properties, 'propertiesLenght'=> $propertiesLenght ]);
+        }
+        if ($request->search == "title") {
+            $properties = Property::where('user_id', $id)->where('title', $request->searchValue)->orderBy('created_at', 'desc')->with(['category', 'city', 'user'])->get();
+            $propertiesLenght = count( $properties);
+            return response()->json(['properties' => $properties, 'propertiesLenght'=> $propertiesLenght ]);
+        }
+        if ($request->search == "city") {
+            $citySelected = City::where('name', $request->searchValue)->get();
+            error_log($citySelected);
+            $properties = Property::where('user_id', $id)->where('city_id', $citySelected[0]->id)->orderBy('created_at', 'desc')->with(['category', 'city', 'user'])->get();
+            $propertiesLenght = count( $properties);
+            return response()->json(['properties' => $properties, 'propertiesLenght'=> $propertiesLenght ]);
+        }
+    }
+    public function searchAll(Request $request)
+    {
+        if ($request->search == "id") {
+            $properties = Property::where('id', $request->searchValue)->orderBy('created_at', 'desc')->with(['category', 'city', 'user'])->get();
+            $propertiesLenght = count( $properties);
+            return response()->json(['properties' => $properties, 'propertiesLenght'=> $propertiesLenght ]);
+        }
+        if ($request->search == "title") {
+            $properties = Property::where('title', $request->searchValue)->orderBy('created_at', 'desc')->with(['category', 'city', 'user'])->get();
+            $propertiesLenght = count( $properties);
+            return response()->json(['properties' => $properties, 'propertiesLenght'=> $propertiesLenght ]);
+        }
+        if ($request->search == "city") {
+            $citySelected = City::where('name', $request->searchValue)->get();
+            error_log($citySelected);
+            $properties = Property::where('city_id', $citySelected[0]->id)->orderBy('created_at', 'desc')->with(['category', 'city', 'user'])->get();
+            $propertiesLenght = count( $properties);
+            return response()->json(['properties' => $properties, 'propertiesLenght'=> $propertiesLenght ]);
+        }
     }
 }

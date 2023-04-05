@@ -30,6 +30,8 @@ Route::group(["middleware" => "auth:sanctum"], function () {
     Route::get('/list-users', [UserController::class, 'getUsers']);
     Route::get('/last-properties', [PropertyController::class, 'getLastPropoerty']);
     Route::post('/edit-user/{id}', [UserController::class, 'editUser']);
+    Route::delete('/delete-user/{id}', [UserController::class, 'delete']);
+
 
     Route::get('/list-properties', [PropertyController::class, 'getAllProperties']);
     Route::get('/list-properties/{page}', [PropertyController::class, 'getPropertyPerPage']);
@@ -38,13 +40,13 @@ Route::group(["middleware" => "auth:sanctum"], function () {
     Route::get('/my-properties/{id}/{page}', [PropertyController::class, 'getMyPropertyPerPage']);
 
     Route::post('/edit-property/{id}', [PropertyController::class, 'editProperty']);
-    Route::delete('/delete-property/{id}', [PropertyController::class ,'delete']);
+    Route::delete('/delete-property/{id}', [PropertyController::class, 'delete']);
 
-    Route::delete('/delete-picture/{id}', [PropertyController::class ,'deletePicture']);
+    Route::delete('/delete-picture/{id}', [PropertyController::class, 'deletePicture']);
     Route::post('/delete-category/{id}', [CategoryController::class, 'deleteCategory']);
 
-
-
+    Route::post('/search/{id}', [PropertyController::class, 'search']);
+    Route::post('/searchAll', [PropertyController::class, 'searchAll']);
 
 });
 

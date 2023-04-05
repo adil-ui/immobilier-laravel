@@ -74,4 +74,8 @@ class UserController extends Controller
         $users = User::orderBy("created_at", "desc")->get();
         return response()->json(['users' => $users]);
     }
+    public function delete($id)
+    {
+        User::find($id)->delete();
+    }
 }
